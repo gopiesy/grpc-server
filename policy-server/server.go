@@ -12,6 +12,7 @@ import (
 )
 
 type PolicyServiceServer struct {
+	policies.UnimplementedPolicyServiceServer
 }
 
 func (p PolicyServiceServer) StreamSnapshots(stream policies.PolicyService_StreamSnapshotsServer) error {

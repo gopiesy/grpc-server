@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	server "grpc-server/policy-server"
 	"log"
 	"net"
 
+	server "github.com/gopiesy/grpc-server/policy-server"
 	"github.com/gopiesy/project-protos/policies"
 	"google.golang.org/grpc"
 )
@@ -23,6 +23,8 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	policies.RegisterPolicyServiceServer(grpcServer, server.PolicyServiceServer{})
-	grpcServer.Serve(lis)
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Panic(err)
+	}
 	log.Printf("Initializing gRPC server on port %d", *port)
 }
