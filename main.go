@@ -23,8 +23,8 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	policies.RegisterPolicyServiceServer(grpcServer, server.PolicyServiceServer{})
+	log.Printf("Initializing gRPC server on port %d", *port)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Panic(err)
 	}
-	log.Printf("Initializing gRPC server on port %d", *port)
 }

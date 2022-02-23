@@ -16,26 +16,30 @@ type PolicyServiceServer struct {
 }
 
 func (p PolicyServiceServer) StreamSnapshots(stream policies.PolicyService_StreamSnapshotsServer) error {
-	for {
-		streamCpy := stream
-		go func(stream policies.PolicyService_StreamSnapshotsServer) {
+
+	streamCpy := stream
+	go func(stream policies.PolicyService_StreamSnapshotsServer) {
+		for {
 			status, err := stream.Recv()
 			if err == io.EOF {
-				log.Println("EOF received and exiting")
+				log.Println("EOF received and client exited")
 				return
-			}
-			if err != nil {
+			} else if err != nil {
 				log.Panic(err)
+			} else {
+				// received status
+				log.Println("Recv Status: ", status.GetSnapshotName())
 			}
-			// received status
-			log.Println("Status: ", status.GetSnapshotName())
-		}(streamCpy)
+		}
+	}(streamCpy)
 
+	for {
 		now := timestamppb.Now()
 		name := fmt.Sprintf("NewSnapshot.%d", now.Seconds)
 		if err := stream.Send(&policies.Snapshot{Name: name, Time: now, Data: nil}); err != nil {
 			return err
 		}
+		fmt.Println("Send NewSnapshot: ", name)
 		<-time.After(time.Duration(time.Second * 2))
 	}
 }
